@@ -10,6 +10,7 @@ namespace Laminas\Validator;
 
 use DateTime;
 use DateTimeImmutable;
+use Laminas\Stdlib\ArrayUtils;
 use Traversable;
 
 /**
@@ -68,14 +69,20 @@ class Date extends AbstractValidator
     public function __construct($options = [])
     {
         if ($options instanceof Traversable) {
-            $options = iterator_to_array($options);
-        } elseif (! is_array($options)) {
-            $options = func_get_args();
-            $temp['format'] = array_shift($options);
-            $options = $temp;
+            $options = ArrayUtils::iteratorToArray($options);
+        }
+        if (! is_array($options)) {
+            $options = $this->argumentsAsArray(...func_get_args());
         }
 
         parent::__construct($options);
+    }
+
+    private function argumentsAsArray($format = null)
+    {
+        return [
+            'format' => $format,
+        ];
     }
 
     /**

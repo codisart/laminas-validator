@@ -64,28 +64,30 @@ class LessThan extends AbstractValidator
             $options = ArrayUtils::iteratorToArray($options);
         }
         if (! is_array($options)) {
-            $options = func_get_args();
-            $temp['max'] = array_shift($options);
-
-            if (! empty($options)) {
-                $temp['inclusive'] = array_shift($options);
-            }
-
-            $options = $temp;
+            $options = $this->argumentsAsArray(...func_get_args());
         }
 
+        $this->shouldHaveAMaxValue($options);
+
+        $this->setMax($options['max'])
+             ->setInclusive($options['inclusive'] ?? false);
+
+        parent::__construct($options);
+    }
+
+    private function argumentsAsArray($max = null, $inclusive = false)
+    {
+        return [
+            'max' => $max,
+            'inclusive' => $inclusive,
+        ];
+    }
+
+    private function shouldHaveAMaxValue($options)
+    {
         if (! array_key_exists('max', $options)) {
             throw new Exception\InvalidArgumentException("Missing option 'max'");
         }
-
-        if (! array_key_exists('inclusive', $options)) {
-            $options['inclusive'] = false;
-        }
-
-        $this->setMax($options['max'])
-             ->setInclusive($options['inclusive']);
-
-        parent::__construct($options);
     }
 
     /**
