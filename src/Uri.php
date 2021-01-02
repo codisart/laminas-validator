@@ -8,6 +8,7 @@
 
 namespace Laminas\Validator;
 
+use Laminas\Stdlib\ArrayUtils;
 use Laminas\Uri\Exception\ExceptionInterface as UriException;
 use Laminas\Uri\Uri as UriHandler;
 use Laminas\Validator\Exception\InvalidArgumentException;
@@ -49,18 +50,10 @@ class Uri extends AbstractValidator
     public function __construct($options = [])
     {
         if ($options instanceof Traversable) {
-            $options = iterator_to_array($options);
-        } elseif (! is_array($options)) {
-            $options = func_get_args();
-            $temp['uriHandler'] = array_shift($options);
-            if (! empty($options)) {
-                $temp['allowRelative'] = array_shift($options);
-            }
-            if (! empty($options)) {
-                $temp['allowAbsolute'] = array_shift($options);
-            }
-
-            $options = $temp;
+            $options = ArrayUtils::iteratorToArray($options);
+        }
+        if (! is_array($options)) {
+            $options = $this->argumentsAsArray(...func_get_args());
         }
 
         if (isset($options['uriHandler'])) {
@@ -74,6 +67,15 @@ class Uri extends AbstractValidator
         }
 
         parent::__construct($options);
+    }
+
+    public function argumentsAsArray($uriHandler = null, $allowRelative = null, $allowAbsolute = null)
+    {
+        return [
+            'uriHandler' => $uriHandler,
+            'allowRelative' => $allowRelative,
+            'allowAbsolute' => $allowAbsolute,
+        ];
     }
 
     /**

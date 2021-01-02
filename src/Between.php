@@ -76,38 +76,44 @@ class Between extends AbstractValidator
             $options = ArrayUtils::iteratorToArray($options);
         }
         if (! is_array($options)) {
-            $options = func_get_args();
-            $temp['min'] = array_shift($options);
-            if (! empty($options)) {
-                $temp['max'] = array_shift($options);
-            }
-
-            if (! empty($options)) {
-                $temp['inclusive'] = array_shift($options);
-            }
-
-            $options = $temp;
+            $options = $this->argumentsAsArray(func_get_args());
         }
 
         if (! array_key_exists('min', $options) || ! array_key_exists('max', $options)) {
             throw new Exception\InvalidArgumentException("Missing option: 'min' and 'max' have to be given");
         }
 
-        if ((isset($options['min']) && is_numeric($options['min']))
-            && (isset($options['max']) && is_numeric($options['max']))
-        ) {
-            $this->numeric = true;
-        } elseif ((isset($options['min']) && is_string($options['min']))
-            && (isset($options['max']) && is_string($options['max']))
-        ) {
-            $this->numeric = false;
-        } else {
-            throw new Exception\InvalidArgumentException(
-                "Invalid options: 'min' and 'max' should be of the same scalar type"
-            );
-        }
+        $this->shouldBeSameScalarType($options['min'], $options['max']);
 
         parent::__construct($options);
+    }
+
+    public function argumentsAsArray($args)
+    {
+        $keys = ['min' , 'max' , 'inclusive'];
+        $result = [];
+        foreach ($args as $arg) {
+            $result[array_shift($keys)] = $arg;
+        }
+        return $result;
+    }
+
+    /**
+     * @throws Exception\InvalidArgumentException
+     */
+    private function shouldBeSameScalarType($min, $max)
+    {
+        if ((isset($min) && is_numeric($min)) && (isset($max) && is_numeric($max))) {
+             $this->numeric = true;
+             return;
+        }
+        if ((isset($min) && is_string($min)) && (isset($max) && is_string($max))) {
+            $this->numeric = false;
+            return;
+        }
+        throw new Exception\InvalidArgumentException(
+            "Invalid options: 'min' and 'max' should be of the same scalar type"
+        );
     }
 
     /**

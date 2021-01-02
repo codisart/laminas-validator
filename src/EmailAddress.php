@@ -91,20 +91,18 @@ class EmailAddress extends AbstractValidator
     public function __construct($options = [])
     {
         if (! is_array($options)) {
-            $options = func_get_args();
-            $temp['allow'] = array_shift($options);
-            if (! empty($options)) {
-                $temp['useMxCheck'] = array_shift($options);
-            }
-
-            if (! empty($options)) {
-                $temp['hostnameValidator'] = array_shift($options);
-            }
-
-            $options = $temp;
+            $options = $this->argumentsAsArray(...func_get_args());
         }
-
         parent::__construct($options);
+    }
+
+    private function argumentsAsArray($allow = null, $useMxCheck = null, $hostnameValidator = null)
+    {
+        return [
+            'allow' => $allow,
+            'useMxCheck' => $useMxCheck,
+            'hostnameValidator' => $hostnameValidator,
+        ];
     }
 
     /**

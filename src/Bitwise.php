@@ -8,6 +8,7 @@
 
 namespace Laminas\Validator;
 
+use Laminas\Stdlib\ArrayUtils;
 use Traversable;
 
 class Bitwise extends AbstractValidator
@@ -66,26 +67,23 @@ class Bitwise extends AbstractValidator
     public function __construct($options = null)
     {
         if ($options instanceof Traversable) {
-            $options = iterator_to_array($options);
+            $options = ArrayUtils::iteratorToArray($options);
         }
 
         if (! is_array($options)) {
-            $options = func_get_args();
-
-            $temp['control'] = array_shift($options);
-
-            if (! empty($options)) {
-                $temp['operator'] = array_shift($options);
-            }
-
-            if (! empty($options)) {
-                $temp['strict'] = array_shift($options);
-            }
-
-            $options = $temp;
+            $options = $this->argumentsAsArray(...func_get_args());
         }
 
         parent::__construct($options);
+    }
+
+    public function argumentsAsArray($control = null, $operator = null, $strict = null)
+    {
+        return [
+            'control' => $control,
+            'operator' => $operator,
+            'strict' => $strict,
+        ];
     }
 
     /**
